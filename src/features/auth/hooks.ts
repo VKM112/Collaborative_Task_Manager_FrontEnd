@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getCurrentUser, login, logout, register } from '../../api/auth.api'
+import { getCurrentUser, googleLogin, login, logout, register } from '../../api/auth.api'
 import type { LoginInput, RegisterInput, User } from './types'
 
 export const useProfile = () =>
@@ -38,6 +38,17 @@ export const useLogout = () => {
     mutationFn: logout,
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: ['me'] })
+    },
+  })
+}
+
+export const useGoogleLogin = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<User, Error, string>({
+    mutationFn: (idToken) => googleLogin(idToken),
+    onSuccess: (user) => {
+      queryClient.setQueryData(['me'], user)
     },
   })
 }

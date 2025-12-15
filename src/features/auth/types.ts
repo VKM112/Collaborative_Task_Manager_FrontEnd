@@ -4,6 +4,9 @@ export interface User {
   email: string
   role?: 'member' | 'admin'
   createdAt?: string
+  avatar?: string
+  provider?: 'local' | 'google'
+  googleId?: string
 }
 
 export interface LoginInput {

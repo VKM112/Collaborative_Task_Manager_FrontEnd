@@ -13,8 +13,17 @@ const ProfilePage = () => {
         <main className="flex-1 space-y-6 p-6">
           <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-semibold text-slate-900">Profile</h1>
-              <span className="text-xs uppercase tracking-wide text-slate-500">Private</span>
+              <div>
+                <h1 className="text-2xl font-semibold text-slate-900">Profile</h1>
+                <p className="text-xs uppercase tracking-wide text-slate-500">Private</p>
+              </div>
+              {profile?.avatar && (
+                <img
+                  src={profile.avatar}
+                  alt={`${profile.name ?? 'User'} avatar`}
+                  className="h-10 w-10 rounded-full border border-slate-200 object-cover"
+                />
+              )}
             </div>
             {isLoading ? (
               <p className="text-sm text-slate-500">Loading profile...</p>

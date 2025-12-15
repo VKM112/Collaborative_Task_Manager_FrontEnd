@@ -6,7 +6,7 @@ const Sidebar = () => {
       <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">Workspace</div>
       <ul className="space-y-2 text-sm text-slate-700">
         <li>
-          <Link to="/" className="block rounded-lg px-3 py-2 hover:bg-white hover:text-slate-900">
+          <Link to="/dashboard" className="block rounded-lg px-3 py-2 hover:bg-white hover:text-slate-900">
             Dashboard
           </Link>
         </li>
