@@ -1,20 +1,36 @@
-import { useEffect } from 'react'
-import { io } from 'socket.io-client'
-import type { Task } from '../features/tasks/types'
+import { useEffect } from 'react';
+import { io } from 'socket.io-client';
+import { useQueryClient } from '@tanstack/react-query';
+import type { Task } from '../features/tasks/types';
 
-export const useTaskSocket = (onTaskUpdate: (task: Task) => void) => {
+export function useTaskSocket(userId?: string) {
+  const queryClient = useQueryClient();
+
   useEffect(() => {
-    const baseUrl = import.meta.env.VITE_SOCKET_URL ?? import.meta.env.VITE_API_URL ?? ''
-    const socket = io(baseUrl, { transports: ['websocket'] })
+    if (!userId) return;
 
-    socket.on('task:updated', onTaskUpdate)
-    socket.on('connect_error', (error) => {
-      console.error('Task socket error', error)
-    })
+    const baseUrl =
+      import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:5000';
+
+    const socket = io(baseUrl, { withCredentials: true });
+
+    socket.emit('join', userId);
+
+    socket.on('task-updated', (task: Task) => {
+      queryClient.setQueryData<Task[]>(['tasks'], (old = []) =>
+        old.map((t) => (t.id === task.id ? task : t))
+      );
+    });
+
+    socket.on('task-assigned', (task: Task) => {
+      queryClient.setQueryData<Task[]>(['tasks'], (old = []) =>
+        old.map((t) => (t.id === task.id ? task : t))
+      );
+      // TODO: trigger notification UI
+    });
 
     return () => {
-      socket.off('task:updated', onTaskUpdate)
-      socket.disconnect()
-    }
-  }, [onTaskUpdate])
+      socket.disconnect();
+    };
+  }, [userId, queryClient]);
 }

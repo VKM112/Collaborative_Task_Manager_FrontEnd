@@ -1,14 +1,21 @@
-import type { Task, TaskFilters } from '../features/tasks/types'
-import client from './client'
+import { api } from './client';
+import type { Task, TaskFilters, CreateTaskInput, UpdateTaskInput } from '../features/tasks/types';
 
-export const getTasks = (filters?: TaskFilters) =>
-  client.get<Task[]>('/tasks', { params: filters }).then((response) => response.data)
+export async function getTasks(params?: TaskFilters) {
+  const res = await api.get<Task[]>('/tasks', { params });
+  return res.data;
+}
 
-export const createTask = (payload: Partial<Task>) =>
-  client.post<Task>('/tasks', payload).then((response) => response.data)
+export async function createTask(data: CreateTaskInput) {
+  const res = await api.post<Task>('/tasks', data);
+  return res.data;
+}
 
-export const updateTask = (taskId: string, payload: Partial<Task>) =>
-  client.patch<Task>(`/tasks/${taskId}`, payload).then((response) => response.data)
+export async function updateTask(id: string, data: UpdateTaskInput) {
+  const res = await api.put<Task>(`/tasks/${id}`, data);
+  return res.data;
+}
 
-export const deleteTask = (taskId: string) =>
-  client.delete(`/tasks/${taskId}`).then((response) => response.data)
+export async function deleteTask(id: string) {
+  await api.delete(`/tasks/${id}`);
+}

@@ -1,11 +1,21 @@
-import client from './client'
-import type { AuthResponse, LoginInput, RegisterInput, User } from '../features/auth/types'
+import { api } from './client';
+import type { User } from '../features/auth/types';
 
-export const login = (payload: LoginInput) =>
-  client.post<AuthResponse>('/auth/login', payload).then((response) => response.data)
+export async function login(data: { email: string; password: string }) {
+  const res = await api.post<{ user: User }>('/auth/login', data);
+  return res.data.user;
+}
 
-export const register = (payload: RegisterInput) =>
-  client.post<AuthResponse>('/auth/register', payload).then((response) => response.data)
+export async function register(data: { name: string; email: string; password: string }) {
+  const res = await api.post<{ user: User }>('/auth/register', data);
+  return res.data.user;
+}
 
-export const fetchProfile = () =>
-  client.get<User>('/auth/profile').then((response) => response.data)
+export async function getCurrentUser() {
+  const res = await api.get<{ user: User }>('/auth/me');
+  return res.data.user;
+}
+
+export async function logout() {
+  await api.post('/auth/logout');
+}

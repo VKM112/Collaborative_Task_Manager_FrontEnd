@@ -1,8 +1,12 @@
-import { RouterProvider } from 'react-router-dom'
-import router from './router'
+import { RouterProvider } from 'react-router-dom';
+import { router } from './router';
+import { QueryProvider } from './providers/QueryProvider';
+import './styles/globals.css';
 
-const App = () => {
-  return <RouterProvider router={router} />
+export default function App() {
+  return (
+    <QueryProvider>
+      <RouterProvider router={router} />
+    </QueryProvider>
+  );
 }
-
-export default App

@@ -1,41 +1,42 @@
-import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
-import Button from '../components/common/Button'
-import Input from '../components/common/Input'
-import type { LoginInput } from '../features/auth/types'
-import { useLogin } from '../features/auth/hooks'
+import { useState } from 'react';
+import type { FormEvent } from 'react';
+import { useLogin } from '../features/auth/hooks';
 
-const LoginPage = () => {
-  const { register, handleSubmit } = useForm<LoginInput>()
-  const { mutate, isPending } = useLogin()
+export default function LoginPage() {
+  const { mutate, isPending, error } = useLogin();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const onSubmit = (values: LoginInput) => {
-    mutate(values)
+  function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    mutate({ email, password });
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-md space-y-6 rounded-3xl bg-white p-8 shadow-lg">
-        <div>
-          <h1 className="text-3xl font-semibold text-slate-900">Sign in</h1>
-          <p className="text-sm text-slate-500">Manage your tasks and collaborate with your team.</p>
-        </div>
-        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <Input {...register('email')} label="Email address" type="email" required />
-          <Input {...register('password')} label="Password" type="password" required />
-          <Button type="submit" disabled={isPending}>
-            {isPending ? 'Signing in...' : 'Sign in'}
-          </Button>
-        </form>
-        <p className="text-center text-sm text-slate-500">
-          Need an account?{' '}
-          <Link to="/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
-            Create one
-          </Link>
-        </p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center">
+      <form onSubmit={onSubmit} className="w-full max-w-sm space-y-4">
+        <h1 className="text-xl font-semibold">Login</h1>
+        {error && <p className="text-red-500 text-sm">Login failed</p>}
+        <input
+          className="w-full border rounded px-3 py-2"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+        <input
+          className="w-full border rounded px-3 py-2"
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
+        <button
+          className="w-full bg-blue-600 text-white rounded py-2"
+          disabled={isPending}
+        >
+          {isPending ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
     </div>
-  )
+  );
 }
-
-export default LoginPage

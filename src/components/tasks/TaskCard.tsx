@@ -1,29 +1,44 @@
-import Badge from '../common/Badge'
-import type { Task, TaskStatus } from '../../features/tasks/types'
+import type { Task } from '../../features/tasks/types';
 
-const statusVariant: Record<TaskStatus, 'info' | 'warning' | 'success' | 'danger'> = {
-  todo: 'info',
-  'in-progress': 'warning',
-  done: 'success',
+interface TaskCardProps {
+  task: Task;
+  onClick?: () => void;
 }
 
-const TaskCard = ({ task }: { task: Task }) => {
-  const formattedDue = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'
-
+export function TaskCard({ task, onClick }: TaskCardProps) {
   return (
-    <article className="rounded-2xl bg-white p-5 shadow-sm">
-      <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-slate-900">{task.title}</h3>
-        <Badge label={task.status} variant={statusVariant[task.status]} />
+    <div
+      className="border rounded-lg p-4 bg-white shadow-sm cursor-pointer hover:shadow-md transition"
+      onClick={onClick}
+    >
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-semibold text-sm md:text-base line-clamp-1">
+          {task.title}
+        </h3>
+        <span className="text-xs px-2 py-1 rounded-full bg-gray-100">
+          {task.priority}
+        </span>
       </div>
-      <p className="text-sm text-slate-600">{task.description ?? 'No description provided.'}</p>
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
-        <span>Assigned to: {task.assignee ?? 'Unassigned'}</span>
-        <span>Priority: {task.priority}</span>
-        <span>Due: {formattedDue}</span>
-      </div>
-    </article>
-  )
-}
 
-export default TaskCard
+      {task.description && (
+        <p className="text-xs md:text-sm text-gray-600 line-clamp-2 mb-2">
+          {task.description}
+        </p>
+      )}
+
+      <div className="flex items-center justify-between text-[11px] md:text-xs text-gray-500">
+        <span>Status: {task.status}</span>
+        {task.dueDate && (
+          <span>
+            Due:{' '}
+            {new Date(task.dueDate).toLocaleDateString(undefined, {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}

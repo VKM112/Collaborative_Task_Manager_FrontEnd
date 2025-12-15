@@ -2,8 +2,7 @@ export interface User {
   id: string
   name: string
   email: string
-  avatar?: string
-  role?: 'user' | 'admin'
+  role?: 'member' | 'admin'
   createdAt?: string
 }
 
@@ -12,11 +11,8 @@ export interface LoginInput {
   password: string
 }
 
-export interface RegisterInput extends LoginInput {
+export interface RegisterInput {
   name: string
-}
-
-export interface AuthResponse {
-  user: User
-  token: string
+  email: string
+  password: string
 }

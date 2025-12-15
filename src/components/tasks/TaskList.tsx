@@ -1,34 +1,36 @@
-import TaskCard from './TaskCard'
-import Skeleton from '../common/Skeleton'
-import type { Task } from '../../features/tasks/types'
+import type { Task } from '../../features/tasks/types';
+import { TaskCard } from './TaskCard';
 
-type TaskListProps = {
-  tasks?: Task[]
-  isLoading?: boolean
+interface TaskListProps {
+  tasks: Task[];
+  isLoading?: boolean;
+  emptyMessage?: string;
 }
 
-const TaskList = ({ tasks, isLoading }: TaskListProps) => {
+export function TaskList({ tasks, isLoading, emptyMessage }: TaskListProps) {
   if (isLoading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2">
-        {[...Array(4)].map((_, index) => (
-          <Skeleton key={index} className="h-36" />
+      <div className="grid gap-3 md:gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="h-20 md:h-24 rounded-lg bg-gray-100 animate-pulse" />
         ))}
       </div>
-    )
+    );
   }
 
-  if (!tasks || tasks.length === 0) {
-    return <p className="text-sm text-slate-500">No tasks match your current filters.</p>
+  if (!tasks.length) {
+    return (
+      <p className="text-sm text-gray-500 text-center py-4">
+        {emptyMessage || 'No tasks to display.'}
+      </p>
+    );
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      {tasks.map((task) => (
+    <div className="grid gap-3 md:gap-4">
+      {tasks.map(task => (
         <TaskCard key={task.id} task={task} />
       ))}
     </div>
-  )
+  );
 }
-
-export default TaskList
