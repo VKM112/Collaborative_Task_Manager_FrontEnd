@@ -1,6 +1,12 @@
 export type Priority = 'Low' | 'Medium' | 'High' | 'Urgent';
 export type Status = 'ToDo' | 'InProgress' | 'Review' | 'Completed';
 
+export interface TaskUser {
+  id: string;
+  name: string;
+  email?: string;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -12,6 +18,14 @@ export interface Task {
   assignedToId?: string | null;
   createdAt: string;
   updatedAt: string;
+  assignedTo?: TaskUser | null;
+  creator: TaskUser;
+}
+
+export interface Subtask {
+  id: string;
+  title: string;
+  status: Status;
 }
 
 export interface TaskFilters {
@@ -22,6 +36,8 @@ export interface TaskFilters {
   createdByMe?: boolean;
   overdue?: boolean;
   search?: string;
+  assignedToId?: string;
+  creatorId?: string;
 }
 
 export interface CreateTaskInput {
@@ -30,7 +46,7 @@ export interface CreateTaskInput {
   dueDate?: string;
   priority: Priority;
   status: Status;
-  assignedToId?: string;
+  assignedToId: string;
 }
 
 export type UpdateTaskInput = Partial<CreateTaskInput>;

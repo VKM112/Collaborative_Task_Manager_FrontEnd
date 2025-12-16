@@ -5,9 +5,17 @@ interface TaskListProps {
   tasks: Task[];
   isLoading?: boolean;
   emptyMessage?: string;
+  onTaskClick?: (task: Task) => void;
+  currentUserId?: string;
 }
 
-export function TaskList({ tasks, isLoading, emptyMessage }: TaskListProps) {
+export function TaskList({
+  tasks,
+  isLoading,
+  emptyMessage,
+  onTaskClick,
+  currentUserId,
+}: TaskListProps) {
   if (isLoading) {
     return (
       <div className="grid gap-3 md:gap-4">
@@ -28,8 +36,13 @@ export function TaskList({ tasks, isLoading, emptyMessage }: TaskListProps) {
 
   return (
     <div className="grid gap-3 md:gap-4">
-      {tasks.map(task => (
-        <TaskCard key={task.id} task={task} />
+      {tasks.map((task) => (
+        <TaskCard
+          key={task.id}
+          task={task}
+          currentUserId={currentUserId}
+          onClick={onTaskClick ? () => onTaskClick(task) : undefined}
+        />
       ))}
     </div>
   );
