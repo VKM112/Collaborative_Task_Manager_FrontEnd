@@ -8,6 +8,7 @@ import Footer from '../components/layout/Footer'
 import Header from '../components/layout/Header'
 import type { RegisterInput } from '../features/auth/types'
 import { useRegister, useGoogleLogin } from '../features/auth/hooks'
+import { isGoogleLoginEnabled } from '../config/google'
 
 const getRegisterErrorMessage = (error: Error | null | undefined) => {
   if (!error) return undefined
@@ -65,19 +66,28 @@ const RegisterPage = () => {
               <span>or</span>
               <span className="flex-1 border-t border-slate-200" />
             </div>
-            <div className="flex justify-center">
-              <GoogleLogin
-                onSuccess={(response) => {
-                  if (response.credential)
-                    loginWithGoogle(response.credential, {
-                      onSuccess: () => navigate('/dashboard'),
-                    })
-                }}
-                onError={() => console.error('Google login failed')}
-              />
-            </div>
-            {isGooglePending && (
-              <p className="text-center text-sm text-slate-500">Signing in with Google...</p>
+            {isGoogleLoginEnabled ? (
+              <>
+                <div className="flex justify-center">
+                  <GoogleLogin
+                    onSuccess={(response) => {
+                      if (response.credential)
+                        loginWithGoogle(response.credential, {
+                          onSuccess: () => navigate('/dashboard'),
+                        })
+                    }}
+                    onError={() => console.error('Google login failed')}
+                  />
+                </div>
+                {isGooglePending && (
+                  <p className="text-center text-sm text-slate-500">Signing in with Google...</p>
+                )}
+              </>
+            ) : (
+              <p className="text-center text-sm text-slate-500">
+                Google sign-in is temporarily unavailable. Configure `VITE_GOOGLE_CLIENT_ID` to enable
+                it.
+              </p>
             )}
           </div>
           <p className="text-center text-sm text-slate-500">
