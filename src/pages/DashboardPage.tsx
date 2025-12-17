@@ -54,7 +54,7 @@ export default function DashboardPage() {
   const [subtasksByTask, setSubtasksByTask] = useState<Record<string, Subtask[]>>({})
 
   const { data: profile } = useProfile()
-  const { data: users = [] } = useUsers()
+  const { data: users = [] } = useUsers(!!profile)
   const { mutate: createTask, isPending: isCreating } = useCreateTask()
   const { mutate: updateTask, isPending: isUpdating } = useUpdateTask()
 
@@ -78,7 +78,7 @@ export default function DashboardPage() {
     return nextFilters
   }, [status, priority, sortBy, tab, profile?.id])
 
-  const { data: tasks = [], isLoading } = useTasks(queryFilters)
+  const { data: tasks = [], isLoading } = useTasks(queryFilters, !!profile)
   const isSaving = isCreating || isUpdating
 
   const openNewTask = () => {
