@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 declare namespace NodeJS {
   interface ProcessEnv {
     /**
@@ -20,14 +22,5 @@ declare namespace NodeJS {
 }
 
 declare const process: NodeJS.Process
-
-interface ImportMetaEnv {
-  readonly VITE_API_URL?: string
-  readonly VITE_GOOGLE_CLIENT_ID?: string
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv
-}
 
 declare module '*.css'
