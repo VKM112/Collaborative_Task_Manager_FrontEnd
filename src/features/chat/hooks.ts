@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { createTeamMessage, getTeamMessages } from '../../api/messages.api'
 import type { TeamMessage } from './types'
 
