@@ -6,7 +6,15 @@ import TaskFormModal from '../components/tasks/TaskFormModal'
 import TeamSidebar from '../components/teams/TeamSidebar'
 import TeamChatPanel from '../components/teams/TeamChatPanel'
 import { useCreateTask, useTasks, useUpdateTask } from '../features/tasks/hooks'
-import type { CreateTaskInput, Priority, Status, Subtask, Task, TaskFilters } from '../features/tasks/types'
+import type {
+  CreateTaskInput,
+  Priority,
+  Status,
+  Subtask,
+  Task,
+  TaskFilters,
+  TaskFormPayload,
+} from '../features/tasks/types'
 import { useProfile } from '../features/auth/hooks'
 import type { User } from '../features/auth/types'
 import { useCreateTeam, useJoinTeam, useTeams, useTeamMembers } from '../features/teams/hooks'
@@ -51,16 +59,12 @@ export default function DashboardPage() {
 
   const { data: profile } = useProfile()
   const { data: teams = [], isLoading: teamsLoading } = useTeams(!!profile)
-  const {
-    mutateAsync: createTeamAsync,
-    isLoading: isCreatingTeam,
-    error: createTeamError,
-  } = useCreateTeam()
-  const {
-    mutateAsync: joinTeamAsync,
-    isLoading: isJoiningTeam,
-    error: joinTeamError,
-  } = useJoinTeam()
+  const createTeamMutation = useCreateTeam()
+  const joinTeamMutation = useJoinTeam()
+  const isCreatingTeam = createTeamMutation.isPending
+  const isJoiningTeam = joinTeamMutation.isPending
+  const createTeamError = createTeamMutation.error
+  const joinTeamError = joinTeamMutation.error
 
   useEffect(() => {
     if (!selectedTeamId && teams.length) {
@@ -112,14 +116,12 @@ export default function DashboardPage() {
 
   const { data: tasks = [], isLoading: tasksLoading } = useTasks(queryFilters ?? undefined, !!queryFilters && !!profile)
 
-  const {
-    mutate: createTask,
-    isLoading: isCreatingTask,
-  } = useCreateTask()
-  const {
-    mutate: updateTask,
-    isLoading: isUpdatingTask,
-  } = useUpdateTask()
+  const createTaskMutation = useCreateTask()
+  const updateTaskMutation = useUpdateTask()
+  const createTask = createTaskMutation.mutate
+  const updateTask = updateTaskMutation.mutate
+  const isCreatingTask = createTaskMutation.isPending
+  const isUpdatingTask = updateTaskMutation.isPending
 
   const isSavingTask = isCreatingTask || isUpdatingTask
 
@@ -130,13 +132,13 @@ export default function DashboardPage() {
     setTeamAlert(null)
   }
 
-  const handleSave = (payload: CreateTaskInput) => {
+  const handleSave = (payload: TaskFormPayload) => {
     if (!selectedTeamId) {
       setTeamAlert('Select a team before creating tasks.')
       return
     }
 
-    const nextPayload = { ...payload, teamId: selectedTeamId }
+    const nextPayload: CreateTaskInput = { ...payload, teamId: selectedTeamId }
 
     if (editingTask) {
       const { teamId, ...rest } = nextPayload
@@ -162,22 +164,20 @@ export default function DashboardPage() {
   }
 
   const { data: teamMessages = [], isLoading: messagesLoading } = useTeamMessages(selectedTeamId ?? undefined, !!selectedTeamId)
-  const {
-    mutate: sendMessage,
-    isLoading: isSendingMessage,
-    error: messageError,
-  } = useCreateTeamMessage()
+  const messageMutation = useCreateTeamMessage()
+  const isSendingMessage = messageMutation.isPending
+  const messageError = messageMutation.error
 
   useTeamChatSocket(selectedTeamId ?? undefined)
 
   const handleSendMessage = (content: string) => {
     if (!selectedTeamId) return
-    sendMessage({ teamId: selectedTeamId, content })
+    messageMutation.mutate({ teamId: selectedTeamId, content })
   }
 
   const handleCreateTeam = async (payload: { name: string; description?: string }) => {
     try {
-      const team = await createTeamAsync(payload)
+      const team = await createTeamMutation.mutateAsync(payload)
       setSelectedTeamId(team.id)
     } catch {
       // error handled in sidebar
@@ -186,7 +186,7 @@ export default function DashboardPage() {
 
   const handleJoinTeam = async (payload: { inviteCode?: string; teamId?: string }) => {
     try {
-      const team = await joinTeamAsync(payload)
+      const team = await joinTeamMutation.mutateAsync(payload)
       setSelectedTeamId(team.id)
     } catch {
       // error handled in sidebar

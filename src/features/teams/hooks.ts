@@ -3,7 +3,7 @@ import { createTeam, getTeamMembers, getTeams, joinTeam } from '../../api/teams.
 import type { Team, TeamMember } from './types'
 
 export function useTeams(enabled = true) {
-  return useQuery<Team[]>({
+  return useQuery<Team[], Error>({
     queryKey: ['teams'],
     queryFn: getTeams,
     enabled,
@@ -31,13 +31,12 @@ export function useJoinTeam() {
 }
 
 export function useTeamMembers(teamId?: string, enabled = true) {
-  return useQuery<TeamMember[]>({
+  return useQuery<TeamMember[], Error>({
     queryKey: ['teamMembers', teamId],
     queryFn: () => {
       if (!teamId) return Promise.resolve([] as TeamMember[])
       return getTeamMembers(teamId)
     },
     enabled: enabled && !!teamId,
-    keepPreviousData: true,
   })
 }

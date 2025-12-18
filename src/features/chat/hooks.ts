@@ -3,14 +3,13 @@ import { createTeamMessage, getTeamMessages } from '../../api/messages.api'
 import type { TeamMessage } from './types'
 
 export function useTeamMessages(teamId?: string, enabled = true) {
-  return useQuery<TeamMessage[]>({
+  return useQuery<TeamMessage[], Error>({
     queryKey: ['teamMessages', teamId],
     queryFn: () => {
       if (!teamId) return Promise.resolve([])
       return getTeamMessages(teamId)
     },
     enabled: enabled && !!teamId,
-    keepPreviousData: true,
   })
 }
 

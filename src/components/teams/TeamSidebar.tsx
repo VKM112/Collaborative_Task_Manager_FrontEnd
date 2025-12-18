@@ -1,4 +1,5 @@
-import { FormEvent, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
+import type { FormEvent } from 'react'
 import Button from '../common/Button'
 import type { Team } from '../../features/teams/types'
 import { getErrorMessage } from '../../utils/api.util'

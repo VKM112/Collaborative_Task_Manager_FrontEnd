@@ -57,3 +57,5 @@ export interface CreateTaskInput {
 }
 
 export type UpdateTaskInput = Partial<CreateTaskInput>;
+
+export type TaskFormPayload = Omit<CreateTaskInput, 'teamId'>;

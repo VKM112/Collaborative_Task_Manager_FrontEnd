@@ -1,4 +1,5 @@
-import { FormEvent, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
+import type { FormEvent } from 'react'
 import Button from '../common/Button'
 import type { TeamMessage } from '../../features/chat/types'
 import { getErrorMessage } from '../../utils/api.util'
@@ -28,6 +29,7 @@ const TeamChatPanel = ({
   onSendMessage,
 }: TeamChatPanelProps) => {
   const [message, setMessage] = useState('')
+  const errorMessage = getErrorMessage(sendError)
 
   const canSend = !!teamId && message.trim().length > 0
 
@@ -72,22 +74,22 @@ const TeamChatPanel = ({
       </div>
 
       <div className="min-h-[220px] space-y-4 overflow-y-auto rounded-2xl border border-slate-100 bg-slate-50/80 p-4">
-        {isLoading ? <p className="text-sm text-slate-500">Loading messages…</p> : renderedMessages}
+        {isLoading ? <p className="text-sm text-slate-500">Loading messages...</p> : renderedMessages}
       </div>
 
       <form className="space-y-2" onSubmit={handleSubmit}>
         <textarea
           value={message}
           onChange={(event) => setMessage(event.target.value)}
-          placeholder={teamId ? 'Share an update with the team…' : 'Select a team to start chatting.'}
+          placeholder={teamId ? 'Share an update with the team...' : 'Select a team to start chatting.'}
           className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
           rows={3}
           disabled={!teamId || isSending}
         />
-        {sendError && <p className="text-xs text-rose-500">{getErrorMessage(sendError)}</p>}
+        {errorMessage && <p className="text-xs text-rose-500">{errorMessage}</p>}
         <div className="flex justify-end">
           <Button type="submit" disabled={!canSend || isSending} className="text-xs font-semibold uppercase tracking-[0.3em]">
-            {isSending ? 'Sending…' : 'Send'}
+            {isSending ? 'Sending...' : 'Send'}
           </Button>
         </div>
       </form>

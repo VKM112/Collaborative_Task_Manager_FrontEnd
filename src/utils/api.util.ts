@@ -1,4 +1,4 @@
-import type { AxiosError } from 'axios'
+import { AxiosError } from 'axios'
 
 export function getErrorMessage(error?: unknown) {
   if (!error) return undefined

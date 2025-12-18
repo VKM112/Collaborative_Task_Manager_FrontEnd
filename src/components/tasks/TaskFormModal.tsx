@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Button from '../common/Button'
 import Input from '../common/Input'
-import type { CreateTaskInput, Priority, Status, Task } from '../../features/tasks/types'
+import type { Priority, Status, Task, TaskFormPayload } from '../../features/tasks/types'
 import type { User } from '../../features/auth/types'
 
 interface TaskFormModalProps {
   isOpen: boolean
   onClose: () => void
-  onSave: (payload: CreateTaskInput) => void
+  onSave: (payload: TaskFormPayload) => void
   isSaving?: boolean
   members: User[]
   currentUser?: User | null
@@ -152,7 +152,7 @@ const TaskFormModal = ({
       return
     }
 
-    const payload: CreateTaskInput = {
+    const payload: TaskFormPayload = {
       title: title.trim(),
       description: description.trim() || undefined,
       dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
