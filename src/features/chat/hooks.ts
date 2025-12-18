@@ -14,15 +14,8 @@ export function useTeamMessages(teamId?: string, enabled = true) {
 }
 
 export function useCreateTeamMessage() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ teamId, content }: { teamId: string; content: string }) =>
       createTeamMessage(teamId, content),
-    onSuccess: (message, variables) => {
-      queryClient.setQueryData<TeamMessage[]>(['teamMessages', variables.teamId], (old = []) => [
-        ...old,
-        message,
-      ])
-    },
   })
 }
