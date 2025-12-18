@@ -9,9 +9,10 @@ interface TaskFormModalProps {
   onClose: () => void
   onSave: (payload: CreateTaskInput) => void
   isSaving?: boolean
-  users: User[]
+  members: User[]
   currentUser?: User | null
   editingTask?: Task | null
+  teamName?: string
 }
 
 type AssignOption = {
@@ -36,9 +37,10 @@ const TaskFormModal = ({
   onClose,
   onSave,
   isSaving,
-  users,
+  members,
   currentUser,
   editingTask,
+  teamName,
 }: TaskFormModalProps) => {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -84,14 +86,14 @@ const TaskFormModal = ({
   }, [editingTask, currentUser, isOpen])
 
   const assignOptions: AssignOption[] = useMemo(() => {
-    return users
-      .filter((user) => user.id !== currentUser?.id)
+    return members
+      .filter((member) => member.id !== currentUser?.id)
       .map((user) => ({
         id: user.id,
         label: user.name,
         email: user.email,
       }))
-  }, [users, currentUser])
+  }, [members, currentUser])
 
   const filteredAssignOptions = useMemo(() => {
     if (!searchTerm) return assignOptions
@@ -190,9 +192,14 @@ const TaskFormModal = ({
             ×
           </button>
         </div>
-        <p className="mt-1 text-xs uppercase tracking-[0.3em] text-slate-400">
-          Assign responsibility
-        </p>
+        <div>
+          <p className="mt-1 text-xs uppercase tracking-[0.3em] text-slate-400">Assign responsibility</p>
+          {teamName && (
+            <p className="mt-1 text-[0.7rem] uppercase tracking-[0.25em] text-indigo-500">
+              Team: {teamName}
+            </p>
+          )}
+        </div>
 
         <div className="mt-5 space-y-4">
           <div>

@@ -20,6 +20,11 @@ export interface Task {
   updatedAt: string;
   assignedTo?: TaskUser | null;
   creator: TaskUser;
+  teamId: string;
+  team?: {
+    id: string;
+    name: string;
+  };
 }
 
 export interface Subtask {
@@ -29,6 +34,7 @@ export interface Subtask {
 }
 
 export interface TaskFilters {
+  teamId?: string;
   status?: Status;
   priority?: Priority;
   sortBy?: 'dueDate' | 'createdAt';
@@ -47,6 +53,7 @@ export interface CreateTaskInput {
   priority: Priority;
   status: Status;
   assignedToId: string;
+  teamId: string;
 }
 
 export type UpdateTaskInput = Partial<CreateTaskInput>;
