@@ -71,3 +71,7 @@ export default defineConfig([
   },
 ])
 ```
+
+## Environment variables
+
+Copy `.env.example` to `.env` during development and fill in the values. The deployed frontend also needs `VITE_GOOGLE_CLIENT_ID` set (use the same OAuth client ID the backend expects) - add that variable in Render's frontend Environment settings so Google Sign-In stays active in prod.
