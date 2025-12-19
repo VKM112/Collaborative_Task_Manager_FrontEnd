@@ -12,46 +12,53 @@
 - [Testing](#-testing)
 - [Deployment](#-deployment)
 - [License](#-license)
+- [Author](#-author)
 
 ## ✨ Features
-- Mobile-first React 19 interface with Tailwind CSS
-- Rich task management UI featuring filters for status, priority, due date, and sorting
-- Personalized dashboards for created, assigned, and overdue tasks
-- JWT authentication flow with HttpOnly cookies managed by the backend
-- Live updates via Socket.io + SWR cache invalidation
-- Framer Motion and Lucide React for engaging UI interactions
+- Mobile-first React 19 dashboard that highlights assigned, created, and overdue tasks
+- Filtering and sorting by status, priority, due date, and assignee
+- Google OAuth + JWT auth flow handled with HttpOnly cookies
+- Real-time task updates powered by Socket.io paired with React Query
+- Type-safe forms via React Hook Form + Zod with shared DTOs
+- Tailwind CSS for styling with PostCSS/autoprefixer tooling
 
 ## 🛠 Tech Stack
-- React 19 + TypeScript
-- Vite for fast dev/build cycles
-- Tailwind CSS with custom animation utilities
-- SWR for data fetching & caching
-- React Hook Form + Zod for typed form handling
-- React Router v7 for routing
-- Socket.io client for real-time sync
-- Framer Motion for transitions
-- Lucide React icons
+- **React 19 + TypeScript** for the SPA foundation
+- **Vite** for fast builds
+- **Tailwind CSS + PostCSS + Autoprefixer** for utility-first styling
+- **React Query (@tanstack/react-query)** for server state caching & mutations
+- **React Hook Form + Zod** for form validation
+- **React Router v7** for routing
+- **Socket.io Client** to mirror backend real-time events
+- **Axios** for HTTP requests
+- **@react-oauth/google** for Google Sign-In flows
+- **TypeScript**, **tsconfig** + **Vite plugins** for typing/build tooling
 
 ## 🏗 Architecture
 
 ```
 frontend/src/
-├── components/  # Shared UI pieces (modals, cards, badges)
-├── contexts/    # Auth, socket, and theme providers
-├── hooks/       # Custom hooks (API client, realtime, notifications)
-├── lib/         # API wrapper, fetcher, and utilities
-├── pages/       # Route-level screens (Dashboard, Tasks, Profile)
-├── types/       # Shared type definitions
-├── utils/       # Helpers (date formatting, sort helpers)
-└── styles/      # Tailwind config & custom CSS (if needed)
+├── api/         # Axios clients, auth helpers, interceptors
+├── assets/      # Icons, SVGs, fonts, and static media
+├── components/  # Shared UI primitives (Cards, Modals, Badges)
+├── config/      # Environment constants and timers
+├── features/    # Feature slices (auth, tasks, notifications, settings)
+├── hooks/       # Custom hooks (React Query, realtime, forms)
+├── pages/       # Route-level screens (Dashboard, TaskDetails, Profile)
+├── providers/   # Context providers (AuthProvider, SocketProvider)
+├── styles/      # Global Tailwind layers and CSS utilities
+├── utils/       # Date formatting, sorting, helpers
+├── App.tsx
+├── main.tsx
+└── router.tsx
 ```
 
-Pages compose reusable components, contexts provide global state (auth/socket), and hooks encapsulate the real-time + SWR logic so UI stays declarative.
+Feature folders orchestrate API calls, React Query hooks, and UI states, while providers expose reusable auth/socket state to all pages and components.
 
 ## 📦 Prerequisites
 - Node.js 20+
-- Backend API running (`http://localhost:5000`)
 - npm 10+
+- Backend running at `http://localhost:5000`
 
 ## 🚀 Installation & Setup
 
@@ -61,20 +68,20 @@ cd frontend
 npm install
 ```
 
-Create a `.env` with:
+Create `.env`:
 
 ```
 VITE_API_URL=http://localhost:5000/api/v1
 VITE_SOCKET_URL=http://localhost:5000
 ```
 
-Start the dev server:
+Start dev server:
 
 ```bash
 npm run dev
 ```
 
-Build for production:
+Build & preview:
 
 ```bash
 npm run build
@@ -82,7 +89,8 @@ npm run preview
 ```
 
 ## ⚡ Real-Time Features
-`frontend/src/hooks/useTaskRealtime.ts` pairs Socket.io with SWR:
+
+`frontend/src/hooks/useTaskRealtime.ts` pairs Socket.io with React Query:
 
 ```typescript
 export function useTaskRealtime(mutate: () => void) {
@@ -102,32 +110,33 @@ export function useTaskRealtime(mutate: () => void) {
 }
 ```
 
-Socket connection is authenticated via the JWT stored in HttpOnly cookies, and the backend handles room membership (`user:${userId}`) to target personal notifications.
+The socket connection is authenticated via the JWT cookie the backend sets. Clients join `user:${userId}` rooms so targeted events (e.g. `task-assigned`) reach the right person.
 
 ## 📡 API Expectations
-- All calls expect the backend base path defined by `VITE_API_URL`.
-- API uses JWT stored in cookies, so the browser automatically attaches credentials.
+- All requests target `VITE_API_URL`.
+- JWT is stored in HttpOnly cookies; browsers send it automatically.
 - Key endpoints:
   - `/auth/register`, `/auth/login`, `/auth/logout`
-  - `/tasks` for CRUD + query params (`status`, `priority`, `sortBy`, `sortOrder`)
+  - `/tasks` (supports `status`, `priority`, `sortBy`, `sortOrder` queries)
   - `/tasks/dashboard`, `/tasks/my/assigned`, `/tasks/my/created`, `/tasks/overdue`
   - `/users/profile`
+- React Query mutations invalidate or refetch the task cache once actions succeed.
 
 ## 💡 Design Decisions
-1. **React + SWR**: keeps UI declarative while caching responses; works seamlessly with mutations triggered by Socket.io events.
-2. **Socket.io client via context**: central `SocketProvider` ensures a single connection per session + reconnect logic.
-3. **Tailwind + Framer Motion**: responsive, consistent design system with subtle motion for feedback.
-4. **React Hook Form + Zod**: type-safe validation ensures backend + frontend agree on payload shapes.
-5. **Lucide Icons**: lightweight, modern iconography that pairs well with tailwind utilities.
+1. **React Query + Socket.io** keeps UI responsive while syncing with backend events without manual polling.
+2. **Provider-driven auth/socket context** ensures a single authenticated socket across the app.
+3. **React Hook Form + Zod** mirror backend DTOs, so validation stays consistent end-to-end.
+4. **Tailwind + PostCSS tooling** delivers utility-first styling that compiles fast with Vite.
+5. **Axios + custom API layer** keeps auth headers, error handling, and retries centralized.
 
 ## 🧪 Testing
-- Manual QA via `npm run dev` + browser testing.
-- Optionally run TypeScript checks: `npm run typecheck`.
+- Manual QA with `npm run dev` and browser testing.
+- Type checking via `npm run typecheck` (add script if missing).
 
 ## 🚀 Deployment
 1. Set `VITE_API_URL` to the production backend (e.g., `https://api.example.com/api/v1`).
-2. Build the app: `npm run build`.
-3. Host the `dist/` folder on Vercel, Netlify, or any static host.
+2. Run `npm run build`.
+3. Deploy the `dist/` directory to Vercel, Netlify, or a static host.
 
 ## 📄 License
 ISC
