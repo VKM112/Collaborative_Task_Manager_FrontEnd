@@ -14,7 +14,7 @@ const LandingPage = () => {
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
       <Header />
-      <main className="mx-auto flex flex-1 max-w-6xl flex-col gap-16 px-6 py-12 md:py-20">
+      <main className="mx-auto flex flex-1 max-w-6xl flex-col gap-12 px-4 py-10 sm:px-6 md:gap-16 md:py-20">
         <section className="flex flex-col gap-8 md:flex-row md:items-center">
           <div className="flex-1 space-y-6">
             <p className="text-sm uppercase tracking-[0.4em] text-indigo-600">TaskFlow</p>
@@ -47,18 +47,18 @@ const LandingPage = () => {
               TaskFlow keeps every teammate in sync with real-time updates, so priorities never get lost.
             </p>
             <div className="mt-6 space-y-3 text-sm text-slate-200">
-              <p>• 4 active team members</p>
-              <p>• 18 tasks in progres</p>
-              <p>• 5 overdue items</p>
-              <p>• Notifications on for critical updates</p>
+              <p>ƒ?› 4 active team members</p>
+              <p>ƒ?› 18 tasks in progres</p>
+              <p>ƒ?› 5 overdue items</p>
+              <p>ƒ?› Notifications on for critical updates</p>
             </div>
           </div>
         </section>
 
         <section>
-          <div className="mb-6 flex items-center justify-between">
+          <div className="mb-6 flex flex-col items-center gap-3 text-center md:flex-row md:items-center md:justify-between md:text-left">
             <h3 className="text-2xl font-semibold">Features built for teams and solo makers</h3>
-            <p className="text-sm text-slate-500">Flow from here → Sign Up or Login to continue</p>
+            <p className="text-sm text-slate-500">Flow from here ƒ+' Sign Up or Login to continue</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => (
@@ -66,7 +66,7 @@ const LandingPage = () => {
                 key={feature.title}
                 className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
               >
-                <p className="text-sm font-semibold text-indigo-600">✅</p>
+                <p className="text-sm font-semibold text-indigo-600">ƒo.</p>
                 <h4 className="text-lg font-semibold text-slate-900">{feature.title}</h4>
                 <p className="text-sm text-slate-500">{feature.description}</p>
               </article>

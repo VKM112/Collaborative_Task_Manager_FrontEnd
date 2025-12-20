@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import type { Status, Subtask, Task } from '../../features/tasks/types'
 import Button from '../common/Button'
 
@@ -51,7 +51,7 @@ const TaskDetailDrawer = ({ task, onClose, subtasks, onAddSubtask, onEdit }: Tas
       aria-modal="true"
     >
       <div className="relative w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+        <div className="flex flex-col gap-3 border-b border-slate-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-slate-400"># TaskFlow</p>
             <h3 className="text-xl font-semibold text-slate-900">{task.title}</h3>
@@ -64,15 +64,27 @@ const TaskDetailDrawer = ({ task, onClose, subtasks, onAddSubtask, onEdit }: Tas
             )}
             <button
               type="button"
-              className="text-slate-400 transition hover:text-slate-600"
+              className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-lg text-slate-500 shadow-[0_6px_16px_rgba(148,163,184,0.45)] transition hover:bg-slate-200 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/60"
               onClick={onClose}
               aria-label="Close drawer"
             >
-              ×
+              <svg
+                viewBox="0 0 24 24"
+                className="h-7 w-7"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <line x1="6" y1="6" x2="18" y2="18" />
+                <line x1="18" y1="6" x2="6" y2="18" />
+              </svg>
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-6 px-6 py-6 lg:grid-cols-[2fr,1fr]">
+        <div className="grid grid-cols-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[2fr,1fr]">
           <div className="space-y-6">
             <div className="space-y-3">
               <p className="text-sm text-slate-500">{task.description ?? 'No description yet.'}</p>
@@ -193,3 +205,5 @@ const TaskDetailDrawer = ({ task, onClose, subtasks, onAddSubtask, onEdit }: Tas
 }
 
 export default TaskDetailDrawer
+
+

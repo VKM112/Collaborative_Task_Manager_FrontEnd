@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+﻿import { useEffect, useMemo, useRef, useState } from 'react'
 import Button from '../common/Button'
 import Input from '../common/Input'
 import type { Priority, Status, Task, TaskFormPayload } from '../../features/tasks/types'
@@ -13,6 +13,7 @@ interface TaskFormModalProps {
   currentUser?: User | null
   editingTask?: Task | null
   teamName?: string
+  mode?: 'team' | 'personal'
 }
 
 type AssignOption = {
@@ -41,7 +42,9 @@ const TaskFormModal = ({
   currentUser,
   editingTask,
   teamName,
+  mode = 'team',
 }: TaskFormModalProps) => {
+  const isPersonal = mode === 'personal'
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [dueDate, setDueDate] = useState('')
@@ -74,7 +77,11 @@ const TaskFormModal = ({
       setDueDate(formatDateForInput(editingTask.dueDate))
       setPriority(editingTask.priority)
       setStatus(editingTask.status)
-      setAssignedToId(editingTask.assignedToId ?? currentUser?.id ?? '')
+      if (isPersonal) {
+        setAssignedToId(currentUser?.id ?? '')
+      } else {
+        setAssignedToId(editingTask.assignedToId ?? currentUser?.id ?? '')
+      }
     } else {
       setTitle('')
       setDescription('')
@@ -83,9 +90,10 @@ const TaskFormModal = ({
       setStatus('ToDo')
       setAssignedToId(currentUser?.id ?? '')
     }
-  }, [editingTask, currentUser, isOpen])
+  }, [editingTask, currentUser, isOpen, isPersonal])
 
   const assignOptions: AssignOption[] = useMemo(() => {
+    if (isPersonal) return []
     return members
       .filter((member) => member.id !== currentUser?.id)
       .map((user) => ({
@@ -93,27 +101,26 @@ const TaskFormModal = ({
         label: user.name,
         email: user.email,
       }))
-  }, [members, currentUser])
+  }, [members, currentUser, isPersonal])
 
   const filteredAssignOptions = useMemo(() => {
     if (!searchTerm) return assignOptions
     const term = searchTerm.toLowerCase()
     return assignOptions.filter(
-      (option) =>
-        option.label.toLowerCase().includes(term) ||
-        (option.email?.toLowerCase().includes(term) ?? false),
+      (option) => option.label.toLowerCase().includes(term) || (option.email?.toLowerCase().includes(term) ?? false),
     )
   }, [assignOptions, searchTerm])
 
   const selectedAssignee = assignOptions.find((option) => option.id === assignedToId)
 
   const assignmentMessage = useMemo(() => {
+    if (isPersonal) return 'Personal tasks are visible only to you.'
     if (assignedToId && currentUser && assignedToId === currentUser.id) {
       return 'You will be responsible for this task.'
     }
     if (!selectedAssignee) return 'Assign this task to someone from your workspace.'
     return `This task will be assigned to ${selectedAssignee.label}.`
-  }, [selectedAssignee, currentUser, assignedToId])
+  }, [selectedAssignee, currentUser, assignedToId, isPersonal])
 
   const displayAssignLabel =
     selectedAssignee?.label || (assignedToId === currentUser?.id ? 'You (assigned)' : 'Select user')
@@ -135,7 +142,7 @@ const TaskFormModal = ({
     }
 
     if (!assignedToId) {
-      nextErrors.assignedToId = 'Select a teammate.'
+      nextErrors.assignedToId = isPersonal ? 'Assign to yourself.' : 'Select a teammate.'
     }
 
     if (dueDate) {
@@ -180,24 +187,22 @@ const TaskFormModal = ({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between">
-          <h2 className="text-xl font-semibold text-slate-900">
-            {editingTask ? 'Edit Task' : 'Create Task'}
-          </h2>
+          <h2 className="text-xl font-semibold text-slate-900">{editingTask ? 'Edit Task' : 'Create Task'}</h2>
           <button
             type="button"
-            className="text-slate-400 hover:text-slate-600"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-base font-semibold text-slate-400 hover:text-slate-600"
             onClick={onClose}
             aria-label="Close modal"
           >
-            ×
+            X
           </button>
         </div>
         <div>
-          <p className="mt-1 text-xs uppercase tracking-[0.3em] text-slate-400">Assign responsibility</p>
-          {teamName && (
-            <p className="mt-1 text-[0.7rem] uppercase tracking-[0.25em] text-indigo-500">
-              Team: {teamName}
-            </p>
+          <p className="mt-1 text-xs uppercase tracking-[0.3em] text-slate-400">
+            {isPersonal ? 'Personal task' : 'Assign responsibility'}
+          </p>
+          {teamName && !isPersonal && (
+            <p className="mt-1 text-[0.7rem] uppercase tracking-[0.25em] text-indigo-500">Team: {teamName}</p>
           )}
         </div>
 
@@ -223,63 +228,60 @@ const TaskFormModal = ({
               rows={3}
             />
           </div>
-          <div>
-            <label className="text-sm font-semibold text-slate-800">Assign To</label>
-            <div ref={dropdownRef} className="relative mt-2">
-              <button
-                type="button"
-                className="flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-left text-sm font-medium text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                onClick={() => setAssignOpen((prev) => !prev)}
-              >
-                <span>{displayAssignLabel}</span>
-                <span className="text-xs text-slate-400">▼</span>
-              </button>
-              {assignOpen && (
-                <div className="absolute inset-x-0 top-full mt-2 max-h-60 overflow-auto rounded-2xl border border-slate-200 bg-white shadow-lg">
-                  <div className="border-b border-slate-100 px-3 py-2">
-                    <input
-                      value={searchTerm}
-                      onChange={(event) => setSearchTerm(event.target.value)}
-                      placeholder="Type a teammate"
-                      className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                    />
+          {!isPersonal && (
+            <div>
+              <label className="text-sm font-semibold text-slate-800">Assign To</label>
+              <div ref={dropdownRef} className="relative mt-2">
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-left text-sm font-medium text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  onClick={() => setAssignOpen((prev) => !prev)}
+                >
+                  <span>{displayAssignLabel}</span>
+                  <span className="text-xs text-slate-400">▼</span>
+                </button>
+                {assignOpen && (
+                  <div className="absolute inset-x-0 top-full mt-2 max-h-60 overflow-auto rounded-2xl border border-slate-200 bg-white shadow-lg">
+                    <div className="border-b border-slate-100 px-3 py-2">
+                      <input
+                        value={searchTerm}
+                        onChange={(event) => setSearchTerm(event.target.value)}
+                        placeholder="Type a teammate"
+                        className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div className="max-h-48 overflow-auto">
+                      {filteredAssignOptions.map((option) => (
+                        <button
+                          key={option.id}
+                          type="button"
+                          className={`flex w-full items-center justify-between px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 ${
+                            option.id === selectedAssignee?.id ? 'bg-indigo-50 text-indigo-600' : ''
+                          }`}
+                          onClick={() => {
+                            setAssignedToId(option.id)
+                            setAssignOpen(false)
+                            setSearchTerm('')
+                          }}
+                        >
+                          <div className="flex flex-col text-left">
+                            <span className="font-medium">{option.label}</span>
+                            {option.email && <span className="text-[11px] text-slate-500">{option.email}</span>}
+                          </div>
+                          {option.id === selectedAssignee?.id && <span className="text-xs text-indigo-500">Selected</span>}
+                        </button>
+                      ))}
+                      {!filteredAssignOptions.length && <p className="px-3 py-2 text-sm text-slate-500">No teammates match.</p>}
+                    </div>
                   </div>
-                  <div className="max-h-48 overflow-auto">
-                    {filteredAssignOptions.map((option) => (
-                      <button
-                        key={option.id}
-                        type="button"
-                        className={`flex w-full items-center justify-between px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 ${
-                          option.id === selectedAssignee?.id ? 'bg-indigo-50 text-indigo-600' : ''
-                        }`}
-                        onClick={() => {
-                          setAssignedToId(option.id)
-                          setAssignOpen(false)
-                          setSearchTerm('')
-                        }}
-                      >
-                        <div className="flex flex-col text-left">
-                          <span className="font-medium">{option.label}</span>
-                          {option.email && <span className="text-[11px] text-slate-500">{option.email}</span>}
-                        </div>
-                        {option.id === selectedAssignee?.id && (
-                          <span className="text-xs text-indigo-500">Selected</span>
-                        )}
-                      </button>
-                    ))}
-                    {!filteredAssignOptions.length && (
-                      <p className="px-3 py-2 text-sm text-slate-500">No teammates match.</p>
-                    )}
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
+              {errors.assignedToId && <p className="mt-1 text-xs text-rose-600">{errors.assignedToId}</p>}
+              <p className="mt-1 text-xs text-slate-500">{assignmentMessage}</p>
             </div>
-            {errors.assignedToId && (
-              <p className="mt-1 text-xs text-rose-600">{errors.assignedToId}</p>
-            )}
-            <p className="mt-1 text-xs text-slate-500">{assignmentMessage}</p>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+          )}
+          {isPersonal && <p className="text-xs text-slate-500">{assignmentMessage}</p>}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label className="text-sm font-semibold text-slate-800">Due Date</label>
               <input
@@ -328,7 +330,7 @@ const TaskFormModal = ({
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={isSaving} className="px-4 py-2 text-sm">
-            {isSaving ? 'Saving…' : editingTask ? 'Update Task' : 'Create Task'}
+            {isSaving ? 'Saving...' : editingTask ? 'Update Task' : 'Create Task'}
           </Button>
         </div>
       </div>

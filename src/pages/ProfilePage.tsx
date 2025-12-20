@@ -1,5 +1,5 @@
 import { useProfile } from '../features/auth/hooks'
-import Navbar from '../components/layout/Navbar'
+import WorkspaceHeader from '../components/layout/WorkspaceHeader'
 import Sidebar from '../components/layout/Sidebar'
 
 const ProfilePage = () => {
@@ -7,10 +7,10 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Navbar />
-      <div className="flex">
+      <WorkspaceHeader />
+      <div className="flex flex-col lg:flex-row">
         <Sidebar />
-        <main className="flex-1 space-y-6 p-6">
+        <main className="flex-1 space-y-6 p-4 sm:p-6">
           <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>

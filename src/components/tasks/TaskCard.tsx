@@ -32,7 +32,9 @@ export function TaskCard({ task, onClick, currentUserId }: TaskCardProps) {
       <div className="flex items-center justify-between mb-3">
         <div className="space-y-1">
           <h3 className="font-semibold text-base text-slate-900">{task.title}</h3>
-          <p className="text-xs text-slate-500">{task.creator.name}</p>
+          <p className="text-xs text-slate-500">
+            {task.creator.name} {task.team?.name ? `· ${task.team.name}` : '· Personal'}
+          </p>
         </div>
         <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
           {task.priority}

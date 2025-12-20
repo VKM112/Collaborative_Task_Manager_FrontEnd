@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createTeam, getTeamMembers, getTeams, joinTeam } from '../../api/teams.api'
+import { createTeam, deleteTeam, getTeamMembers, getTeams, joinTeam, leaveTeam } from '../../api/teams.api'
 import type { Team, TeamMember } from './types'
 
 export function useTeams(enabled = true) {
@@ -38,5 +38,25 @@ export function useTeamMembers(teamId?: string, enabled = true) {
       return getTeamMembers(teamId)
     },
     enabled: enabled && !!teamId,
+  })
+}
+
+export function useLeaveTeam() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (teamId: string) => leaveTeam(teamId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] })
+    },
+  })
+}
+
+export function useDeleteTeam() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (teamId: string) => deleteTeam(teamId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] })
+    },
   })
 }

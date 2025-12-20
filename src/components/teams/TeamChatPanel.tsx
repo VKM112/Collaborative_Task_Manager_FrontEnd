@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import Button from '../common/Button'
 import type { TeamMessage } from '../../features/chat/types'
 import { getErrorMessage } from '../../utils/api.util'
+import { getColorStyles } from '../../utils/color.util'
 
 interface TeamChatPanelProps {
   teamId?: string
@@ -49,20 +50,25 @@ const TeamChatPanel = ({
       )
     }
 
-    return messages.map((chat) => (
-      <div key={chat.id} className="flex gap-3">
-        <div className="rounded-full bg-indigo-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-indigo-600">
-          {chat.sender.name.charAt(0)}
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center justify-between text-[0.65rem] uppercase tracking-[0.3em] text-slate-400">
-            <span>{chat.sender.name}</span>
-            <span>{formatTime(chat.createdAt)}</span>
+    return messages.map((chat) => {
+      const color = getColorStyles(chat.sender.id ?? chat.sender.name)
+      return (
+        <div key={chat.id} className="flex gap-3">
+          <div
+            className={`rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] ${color.bg} ${color.text}`}
+          >
+            {chat.sender.name.charAt(0)}
           </div>
-          <p className="mt-1 text-sm text-slate-800">{chat.content}</p>
+          <div className="flex-1">
+            <div className="flex items-center justify-between text-[0.65rem] uppercase tracking-[0.3em] text-slate-400">
+              <span>{chat.sender.name}</span>
+              <span>{formatTime(chat.createdAt)}</span>
+            </div>
+            <p className="mt-1 text-sm text-slate-800">{chat.content}</p>
+          </div>
         </div>
-      </div>
-    ))
+      )
+    })
   }, [messages, teamName])
 
   return (

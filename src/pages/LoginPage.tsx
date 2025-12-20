@@ -8,6 +8,8 @@ import Footer from '../components/layout/Footer'
 import Header from '../components/layout/Header'
 import { useLogin, useGoogleLogin } from '../features/auth/hooks'
 import { isGoogleLoginEnabled } from '../config/google'
+import { AxiosError } from 'axios'
+import { getErrorMessage } from '../utils/api.util'
 
 export default function LoginPage() {
   const { mutate, isPending, error } = useLogin()
@@ -18,7 +20,7 @@ export default function LoginPage() {
 
   function onSubmit(e: FormEvent) {
     e.preventDefault()
-    mutate({ email, password }, { onSuccess: () => navigate('/dashboard') })
+    mutate({ email, password }, { onSuccess: () => navigate('/dashboard', { replace: true }) })
   }
 
   return (
@@ -48,7 +50,13 @@ export default function LoginPage() {
             <Button type="submit" disabled={isPending} className="w-full">
               {isPending ? 'Signing in...' : 'Sign in'}
             </Button>
-            {error && <p className="text-xs text-rose-600">{error.message || 'Login failed'}</p>}
+            {error && (
+              <p className="text-xs text-rose-600">
+                {error instanceof AxiosError && error.response?.status === 401
+                  ? 'This email is not registered. Please sign up.'
+                  : getErrorMessage(error) || 'Login failed'}
+              </p>
+            )}
           </form>
           <div className="space-y-4 rounded border-t border-slate-200 pt-4">
             <div className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-slate-400">
@@ -63,7 +71,7 @@ export default function LoginPage() {
                     onSuccess={(response) => {
                       if (response.credential)
                         loginWithGoogle(response.credential, {
-                          onSuccess: () => navigate('/dashboard'),
+                          onSuccess: () => navigate('/dashboard', { replace: true }),
                         })
                     }}
                     onError={() => console.error('Google login failed')}

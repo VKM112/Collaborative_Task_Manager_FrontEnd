@@ -37,7 +37,7 @@ const RegisterPage = () => {
   const navigate = useNavigate()
 
   const onSubmit = (values: RegisterInput) => {
-    mutate(values, { onSuccess: () => navigate('/dashboard') })
+    mutate(values, { onSuccess: () => navigate('/dashboard', { replace: true }) })
   }
 
   const errorMessage = getRegisterErrorMessage(error)
@@ -73,7 +73,7 @@ const RegisterPage = () => {
                     onSuccess={(response) => {
                       if (response.credential)
                         loginWithGoogle(response.credential, {
-                          onSuccess: () => navigate('/dashboard'),
+                          onSuccess: () => navigate('/dashboard', { replace: true }),
                         })
                     }}
                     onError={() => console.error('Google login failed')}

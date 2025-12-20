@@ -28,3 +28,7 @@ export async function getTeamMembers(teamId: string) {
 export async function leaveTeam(teamId: string) {
   await api.post(`/teams/${teamId}/leave`)
 }
+
+export async function deleteTeam(teamId: string) {
+  await api.delete(`/teams/${teamId}`)
+}
