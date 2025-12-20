@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
@@ -9,7 +10,7 @@ import TeamsPage from './pages/TeamsPage'
 import { useProfile } from './features/auth/hooks'
 
 type GuardProps = {
-  children: JSX.Element
+  children: ReactNode
 }
 
 const LoadingScreen = () => <div className="min-h-screen bg-slate-50" />
